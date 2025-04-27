@@ -1,4 +1,3 @@
-
 defmodule D3bot.Router do
   use Plug.Router
 
@@ -6,8 +5,27 @@ defmodule D3bot.Router do
   plug :match
   plug :dispatch
 
+  @verfy_token "XR1VCwlS317X9Bf5xf1ZsDPo4WebcW1Tr"
+
   get "/" do
-    send_resp(conn, 200, "blablablablaba")
+    send_resp(conn, 200, "3412349812347982374")
+  end
+
+  get "/webhook" do
+    %{query_params: params} = conn
+      |> fetch_query_params()
+
+    mode = Access.get(params, "hub.mode")
+    token = Access.get(params, "hub.verify_token")
+    challenge = Access.get(params, "hub.challenge")
+
+    if mode && token do
+      if mode == "subscribe" && token == @verfy_token do
+        send_resp(conn, 200, challenge)
+      else
+        send_resp(conn, 403, "Forbidden")
+      end
+    end
   end
 
   match _ do
