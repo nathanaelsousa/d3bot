@@ -1,6 +1,6 @@
-defmodule App do
+defmodule D3bot do
   @moduledoc """
-  Documentation for `App`.
+  Documentation for `D3bot`.
   """
 
   @doc """
@@ -8,12 +8,11 @@ defmodule App do
 
   ## Examples
 
-      iex> App.hello()
+      iex> D3bot.hello()
       :world
 
   """
   def hello do
     :world
-    IO.puts("lasdfjlaskdjfslakjfsalkdjf")
   end
 end
