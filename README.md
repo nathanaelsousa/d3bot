@@ -3,7 +3,7 @@
 ## Build and start
 ```bash
 docker build -t d3bot .
-docker create -it -v "$PWD:/usr/local/app" --name d3bot d3bot
+docker create -it -v "$PWD:/home/app/project" --name d3bot d3bot
 docker start -ia d3bot
 ```
 

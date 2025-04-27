@@ -14,5 +14,6 @@ defmodule App do
   """
   def hello do
     :world
+    IO.puts("lasdfjlaskdjfslakjfsalkdjf")
   end
 end
