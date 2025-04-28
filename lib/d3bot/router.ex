@@ -1,7 +1,7 @@
 defmodule D3bot.Router do
   use Plug.Router
 
-  alias D3bot.Replyer
+  alias D3bot.{Replyer, MetaApi}
 
   plug Plug.Logger
   plug :match
@@ -44,36 +44,32 @@ defmodule D3bot.Router do
               "message" => %{
                 "text" => message_text
               },
-              "sender" => %{"id" => message_sender},
+              "sender" => %{"id" => sender_id},
             }
           ],
         }
       ]
     } = body
 
-    reply_text = Replyer.get_reply(message_text, nil)
+    last_reply_id = get_last_reply_id(message_sender)
+    {reply_text, reply_id} = Replyer.get_reply(message_text, last_reply_id)
 
-    IO.inspect({message_sender})
+    MetaApi.send_message(reply_text, sender_id)
 
-    body = %{
-      "recipient" => %{
-        "id" => "9559729030790410"
-      },
-      "messaging_type" =>  "RESPONSE",
-      "message" => %{
-        "text" => reply_text
-      }
-    }
-    headers = [{"Content-Type", "application/json"}]
+    :ets.insert(:conversation_state, {message_sender, reply_id})
 
-    HTTPoison.post!(
-      "https://graph.facebook.com/v22.0/#{@page_id}/messages?access_token=#{@page_access_token}",
-      JSON.encode!(body),
-      headers
-    )
-
-    send_resp(conn, 200, "bla")
+    send_resp(conn, 200, "ok")
   end
+
+  def get_last_reply_id(message_sender) when is_binary(message_sender) do
+    :conversation_state
+    |> :ets.lookup(message_sender)
+    |> get_last_reply_id()
+  end
+
+  def get_last_reply_id([{_message_sender, last_reply_id}]), do: last_reply_id
+
+  def get_last_reply_id([]), do: nil
 
   get "/test" do
     body = %{

@@ -16,6 +16,9 @@ defmodule D3bot.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: D3bot.Supervisor]
+
+    :ets.new(:conversation_state, [:set, :public, :named_table])
+
     Supervisor.start_link(children, opts)
   end
 end
