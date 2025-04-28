@@ -42,13 +42,13 @@ defmodule D3bot.Replyer do
     }
   }
 
-  def get_reply(message_text, last_reply_id)
+  def get_reply(last_reply_id, message_text)
 
-  def get_reply(_message_text, nil) do
+  def get_reply(nil, _message_text) do
     get_next(%{"kind" => "next", "reply_id" => "reply1"}, nil)
   end
 
-  def get_reply(message_text, last_reply_id) do
+  def get_reply(last_reply_id, message_text) do
     get_next(@reply_tree[last_reply_id]["options"][message_text], last_reply_id)
   end
 

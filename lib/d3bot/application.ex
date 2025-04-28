@@ -3,7 +3,7 @@ defmodule D3bot.Application do
   # for more information on OTP Applications
   @moduledoc false
 
-  alias D3bot.Router
+  alias D3botWeb.Router
 
   use Application
 

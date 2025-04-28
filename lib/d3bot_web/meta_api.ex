@@ -1,4 +1,4 @@
-defmodule D3bot.MetaApi do
+defmodule D3botWeb.MetaApi do
 
   @page_id 595509913653173
   @page_access_token System.get_env("PAGE_ACCESS_TOKEN")
