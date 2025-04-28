@@ -1,6 +1,8 @@
 defmodule D3bot.Router do
   use Plug.Router
 
+  alias D3bot.Replyer
+
   plug Plug.Logger
   plug :match
   plug :dispatch
@@ -32,8 +34,7 @@ defmodule D3bot.Router do
 
   post "/webhook" do
     {:ok, body_raw, conn} = Plug.Conn.read_body(conn)
-
-    {:ok, body} = JSON.decode(body_raw)
+    body = JSON.decode!(body_raw)
 
     %{
       "entry" => [
@@ -50,7 +51,9 @@ defmodule D3bot.Router do
       ]
     } = body
 
-    IO.inspect({message_text, message_sender})
+    reply_text = Replyer.get_reply(message_text, nil)
+
+    IO.inspect({message_sender})
 
     body = %{
       "recipient" => %{
@@ -58,19 +61,16 @@ defmodule D3bot.Router do
       },
       "messaging_type" =>  "RESPONSE",
       "message" => %{
-        "text" => message_text
+        "text" => reply_text
       }
     }
     headers = [{"Content-Type", "application/json"}]
 
-    bla = HTTPoison.post!(
+    HTTPoison.post!(
       "https://graph.facebook.com/v22.0/#{@page_id}/messages?access_token=#{@page_access_token}",
       JSON.encode!(body),
       headers
     )
-
-    IO.inspect(bla)
-
 
     send_resp(conn, 200, "bla")
   end
