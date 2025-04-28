@@ -18,5 +18,5 @@ RUN apt-get install inotify-tools
 RUN useradd app
 RUN chown app /home/app
 USER app
- 
-CMD ["/bin/bash"]
+
+CMD ["mix", "run", "--no-halt"]
