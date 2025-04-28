@@ -1,30 +1,30 @@
 defmodule D3botWeb.MetaController do
+  @behaviour Plug
+
+  import Plug.Conn
 
   alias D3botWeb.MetaApi
   alias D3bot.{Replyer, ConversationModel}
 
   @verfy_token "XR1VCwlS317X9Bf5xf1ZsDPo4WebcW1Tr"
 
-  def webhook_get(params) do
+  def init(opts) do
+    opts
+  end
+
+   def call(conn = %Plug.Conn{method: "GET"}, _opts) do
+    %{query_params: params} = fetch_query_params(conn)
     %{
       "hub.mode" => mode,
       "hub.verify_token" => token,
       "hub.challenge" => challenge,
     } = params
 
-    webhook_get(mode, token, challenge)
+    webhook_get(conn, mode, token, challenge)
   end
 
-  def webhook_get("subscribe", @verfy_token, challenge) do
-    {200, challenge}
-  end
-
-  def webhook_get(_mode, _token, _challenge) do
-    {403, "Forbidden"}
-  end
-
-  def webhook_post(body) do
-    {message_text, sender_id} = parse_post_body(body)
+  def call(conn = %Plug.Conn{method: "POST"}, _opts) do
+    {message_text, sender_id} = parse_post_body(conn.body_params)
 
     {reply_text, reply_id} = sender_id
       |> ConversationModel.get()
@@ -34,7 +34,15 @@ defmodule D3botWeb.MetaController do
 
     ConversationModel.save(sender_id, reply_id)
 
-    {200, "ok"}
+    send_resp(conn, 200, "ok")
+  end
+
+  def webhook_get(conn, "subscribe", @verfy_token, challenge) do
+    send_resp(conn, 200, challenge)
+  end
+
+  def webhook_get(conn, _mode, _token, _challenge) do
+    send_resp(conn, 403, "Forbidden")
   end
 
   def parse_post_body(body) do
