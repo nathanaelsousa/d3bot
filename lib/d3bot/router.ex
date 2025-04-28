@@ -28,6 +28,31 @@ defmodule D3bot.Router do
     end
   end
 
+  post "/webhook" do
+    {:ok, body_raw, conn} = Plug.Conn.read_body(conn)
+
+    {:ok, body} = JSON.decode(body_raw)
+
+    %{
+      "entry" => [
+        %{
+          "messaging" => [
+            %{
+              "message" => %{
+                "text" => message_text
+              },
+              "sender" => %{"id" => message_sender},
+            }
+          ],
+        }
+      ]
+    } = body
+
+    IO.inspect({message_text, message_sender})
+
+    send_resp(conn, 200, "bla")
+  end
+
   match _ do
     send_resp(conn, 404, "not found")
   end
