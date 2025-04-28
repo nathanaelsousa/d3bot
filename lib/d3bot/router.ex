@@ -51,6 +51,27 @@ defmodule D3bot.Router do
     } = body
 
     IO.inspect({message_text, message_sender})
+
+    body = %{
+      "recipient" => %{
+        "id" => "9559729030790410"
+      },
+      "messaging_type" =>  "RESPONSE",
+      "message" => %{
+        "text" => message_text
+      }
+    }
+    headers = [{"Content-Type", "application/json"}]
+
+    bla = HTTPoison.post!(
+      "https://graph.facebook.com/v22.0/#{@page_id}/messages?access_token=#{@page_access_token}",
+      JSON.encode!(body),
+      headers
+    )
+
+    IO.inspect(bla)
+
+
     send_resp(conn, 200, "bla")
   end
 
