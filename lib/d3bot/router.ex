@@ -6,6 +6,8 @@ defmodule D3bot.Router do
   plug :dispatch
 
   @verfy_token "XR1VCwlS317X9Bf5xf1ZsDPo4WebcW1Tr"
+  @page_access_token System.get_env("PAGE_ACCESS_TOKEN")
+  @page_id 595509913653173
 
   get "/" do
     send_resp(conn, 200, "3412349812347982374")
@@ -49,6 +51,28 @@ defmodule D3bot.Router do
     } = body
 
     IO.inspect({message_text, message_sender})
+    send_resp(conn, 200, "bla")
+  end
+
+  get "/test" do
+    body = %{
+      "recipient" => %{
+        "id" => "9559729030790410"
+      },
+      "messaging_type" =>  "RESPONSE",
+      "message" => %{
+        "text" => "Hello, world!"
+      }
+    }
+    headers = [{"Content-Type", "application/json"}]
+
+    bla = HTTPoison.post!(
+      "https://graph.facebook.com/v22.0/#{@page_id}/messages?access_token=#{@page_access_token}",
+      JSON.encode!(body),
+      headers
+    )
+
+    IO.inspect(bla)
 
     send_resp(conn, 200, "bla")
   end
