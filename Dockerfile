@@ -11,8 +11,8 @@ WORKDIR /home/app/project
 # COPY src ./src
 EXPOSE 5000
 
-RUN apt-get upgrade
-RUN apt-get install inotify-tools
+RUN apt-get update
+RUN apt-get -y install inotify-tools
 
 # Setup an app  user so the container doesn't run as the root user
 RUN useradd app
