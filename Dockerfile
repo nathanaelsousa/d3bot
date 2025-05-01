@@ -1,22 +1,23 @@
-FROM elixir:1.18
-RUN mkdir /home/app
-RUN mkdir /home/app/project
-WORKDIR /home/app/project
+FROM elixir:1.18 AS d3bot-base
 
-# Install the application dependencies
-# COPY requirements.txt ./
-# RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy in the source code
-# COPY src ./src
-EXPOSE 5000
+RUN useradd -m john
 
 RUN apt-get update
 RUN apt-get -y install inotify-tools
 
-# Setup an app  user so the container doesn't run as the root user
-RUN useradd app
-RUN chown app /home/app
-USER app
+EXPOSE 5000
 
 CMD ["mix", "run", "--no-halt"]
+
+FROM d3bot-base AS d3bot-dev
+
+RUN apt-get update
+RUN apt-get -y install git
+
+RUN apt-get -y install zsh
+RUN usermod -s $(which zsh) john
+
+USER john
+
+RUN ZDOTDIR="$HOME" ZSH="$HOME/.oh-my-zsh" sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN git clone https://github.com/nathanaelsousa/d3bot.git /home/john/d3bot
